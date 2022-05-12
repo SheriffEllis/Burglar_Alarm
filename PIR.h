@@ -7,6 +7,7 @@
 
 class PIR : public Peripheral{
   public:
+    long time_of_last_measure;
     PIR(int output_pin);
     bool measure();
 };

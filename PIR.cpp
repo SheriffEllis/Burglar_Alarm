@@ -10,5 +10,6 @@ PIR::PIR(int output_pin){
 
 bool PIR::measure(){
     state = digitalRead(io_pin);
+    time_of_last_measure = millis();
     return state;
 }
