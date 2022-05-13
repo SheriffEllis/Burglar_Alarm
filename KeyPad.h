@@ -4,9 +4,12 @@
 #include "Arduino.h"
 
 class KeyPad{
-  public:
-    int getPin();
-    int getChoice(String choices[]);
+    private:
+        void flushSerial();
+        void waitForInput();
+    public:
+        int getPin();
+        int getChoice(String choices, int maxChoiceNum);
 };
 
 #endif

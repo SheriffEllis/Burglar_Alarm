@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 Logger::Logger(){
-    stored_pin = 1234;
+
 }
 
 void Logger::pushQueue(){
