@@ -8,7 +8,10 @@ void setup(){
 }
 
 void loop(){
-  choice = keypad.getChoice("0 - Choice 0\n1 - Choice 1\n2 - Choice 2", 2);
+  
+  String test[] = {"Choice0","Choice1","Choice2"};
+  choice = keypad.getChoice(test, 2);
   Serial.print("The choice you input was ");
   Serial.println(choice);
+  
 }

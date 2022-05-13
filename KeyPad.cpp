@@ -33,12 +33,14 @@ int KeyPad::getPin(){
     return pin;
 }
 
-int KeyPad::getChoice(String choices, int maxChoiceNum){
+int KeyPad::getChoice(String choices[], int maxChoiceNum){
     bool valid = false;
     char choice;
     while(!valid){
         flushSerial();
-        Serial.println(choices);
+        for (int i = 0; i <= maxChoiceNum; i++){
+            Serial.println(choices[i]);
+        }
         Serial.print("Choose an option by inputting a digit from 0 to ");
         Serial.println(maxChoiceNum);
         waitForInput();
