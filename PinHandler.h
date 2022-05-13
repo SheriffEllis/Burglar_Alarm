@@ -6,12 +6,14 @@
 class PinHandler{
   private:
     int stored_pin;
-    int tries_left;
+    int tries;
   public:
     PinHandler();
     PinHandler(int pin);
     bool verifyPin(int pin);
     void setPin(int pin);
+    int getTries();
+    void resetTries();
 };
 
 #endif // PINHANDLER_H

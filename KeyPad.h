@@ -9,7 +9,7 @@ class KeyPad{
         void waitForInput();
     public:
         int getPin();
-        int getChoice(String choices, int maxChoiceNum);
+        int getChoice(String choices[], int maxChoiceNum);
 };
 
 #endif

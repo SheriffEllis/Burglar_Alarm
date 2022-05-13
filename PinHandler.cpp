@@ -11,10 +11,22 @@ PinHandler::PinHandler(int pin){
 }
 
 bool PinHandler::verifyPin(int pin){
-    //TODO : implement tries left
-    return stored_pin == pin;
+    if(stored_pin==pin){
+        return true;
+    }else{
+        tries++;
+        return false;
+    }
 }
 
 void PinHandler::setPin(int pin){
     stored_pin = pin;
+}
+
+int PinHandler::getTries(){
+    return tries;
+}
+
+void PinHandler::resetTries(){
+    tries = 0;
 }
