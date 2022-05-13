@@ -1,6 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#define LOGGER_ARRAY_LEN 50
+
 #include "Arduino.h"
 
 struct EventTime{
@@ -10,7 +12,7 @@ struct EventTime{
 
 class Logger{
   private:
-    EventTime events[50];
+    EventTime events[LOGGER_ARRAY_LEN];
     void pushQueue();
   public:
     Logger();

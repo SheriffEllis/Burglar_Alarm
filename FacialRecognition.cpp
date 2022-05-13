@@ -6,7 +6,7 @@ FacialRecognition::FacialRecognition(){
 }
 
 bool FacialRecognition::pendResponse(long timeout){
-
+    return false;
 }
 
 void FacialRecognition::setup(){
@@ -14,13 +14,13 @@ void FacialRecognition::setup(){
 }
 
 bool FacialRecognition::getIsSetup(){
-
+    return false;
 }
 
 bool FacialRecognition::addFace(){
-
+    return false;
 }
 
 bool FacialRecognition::checkFace(){
-
+    return false;
 }
