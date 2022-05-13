@@ -7,11 +7,12 @@
 class Solenoid : public Peripheral{
   private:
     long duration;
+    long durationRunning;
     long start_time;
   public:
     Solenoid(int output_pin);
-    void open(long duration);
-    void update();
+    void open();
+    void update(long duration);
     void close();
 };
 
