@@ -6,13 +6,12 @@
 
 class Solenoid : public Peripheral{
   private:
-    long duration;
-    long durationRunning;
-    long start_time;
+    unsigned long duration; // Stored in milliseconds
+    unsigned long start_time;
   public:
     Solenoid(int output_pin);
-    void open();
-    void update(long duration);
+    void open(unsigned long duration);
+    void update();
     void close();
 };
 
