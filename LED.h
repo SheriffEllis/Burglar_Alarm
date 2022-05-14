@@ -9,6 +9,7 @@ class LED : public Peripheral{
   public:
     LED(int output_pin);
     void setState(bool state);
+    void disable();
 };
 
 #endif // LED_H

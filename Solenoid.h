@@ -13,6 +13,7 @@ class Solenoid : public Peripheral{
     void open(unsigned long duration);
     void update();
     void close();
+    void disable();
 };
 
 #endif // SOLENOID_H

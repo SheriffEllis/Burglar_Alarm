@@ -15,6 +15,7 @@ class Buzzer : public Peripheral{
     void pulse(unsigned long duration, bool is_quiet = false);
     void start(bool is_quiet = false);
     void stop();
+    void disable();
 };
 
 #endif // BUZZER_H

@@ -12,3 +12,8 @@ void LED::setState(bool state){
     this->state = state;
     digitalWrite(io_pin, state);
 }
+
+void LED::disable(){
+    enabled = false;
+    setState(false);
+}

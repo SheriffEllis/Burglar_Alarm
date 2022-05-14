@@ -32,3 +32,9 @@ void Buzzer::stop(){
     noTone(io_pin);
     noTone(quiet_pin);
 }
+
+void Buzzer::disable(){
+    enabled = false;
+    state = false;
+    stop();
+}

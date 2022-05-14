@@ -26,3 +26,8 @@ void Solenoid::close(){
   state = false;
   digitalWrite(io_pin, state);
 }
+
+void Solenoid::disable(){
+  enabled = false;
+  close();
+}

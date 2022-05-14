@@ -7,8 +7,18 @@ class Peripheral{
   protected:
     bool state;
     int io_pin;
-  public:
     bool enabled;
+  public:
+    void disable(){
+      enabled = false;
+      state = false;
+    }
+    void enable(){
+      enabled = true;
+    }
+    bool getEnabled(){
+      return enabled;
+    }
     bool getState(){
       return state;
     }
