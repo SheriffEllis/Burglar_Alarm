@@ -1,12 +1,7 @@
-#include "MagneticSwitch.h"
-#include "LED.h"
-#include "Solenoid.h"
+#include "Arduino.h"
+#include "Buzzer.h"
 
-LED led(10);
-Solenoid solenoid(9);
-MagneticSwitch magnetic_switch1(12);
-MagneticSwitch magnetic_switch2(11);
-
+Buzzer buzzer(10, 9);
 
 void setup(){
   Serial.begin(9600);
@@ -15,10 +10,8 @@ void setup(){
 }
 
 void loop(){
-  led.setState(magnetic_switch1.measure());
-  if(magnetic_switch2.measure()){
-    solenoid.open(1000);
-  }
-
-  solenoid.update();
+  buzzer.pulse(1000);
+  delay(500);
+  buzzer.pulse(2000,true);
+  delay(3000);
 }

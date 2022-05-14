@@ -37,7 +37,6 @@ void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
     buzzer.stop();
-    system_state = 0;
 }
 
 // TODO
@@ -48,12 +47,28 @@ void Controller::sendAlert(int event_type){
 // TODO
 void Controller::processSysState(){
     switch(system_state){
-        case 0:
+        case 0: // Initial state
+            Serial.println("System unarmed");
+            resetAlarm();
+            system_state = 1; // Alarm disabled waiting on user to log in
+            break;
+
+        case 1: // Alarm disabled, waiting on user to log in
+            Serial.println("Pin must be re-entered to continue");
+            Serial.println("No limit to number of attempts.");
+            if(pin_handler.verifyPin(keypad.getPin())){
+                system_state = 2; // Enter main menu
+            };
+            pin_handler.resetTries();
+            break;
+
+        case 2: // Main menu
             
             break;
+
         default:
             Serial.println("Invalid state detected, resetting system");
-            resetAlarm();
+            system_state = 0;
             break;
     }
 }
