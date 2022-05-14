@@ -12,7 +12,7 @@ class KeyPad{
     public:
         int getPin();
         int getPin(unsigned long timer_start);
-        int getChoice(String choices[], int max_choice_num);
+        int getChoice(String choices, int max_choice_num);
 };
 
 #endif
