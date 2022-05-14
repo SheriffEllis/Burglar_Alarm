@@ -2,7 +2,7 @@
 #include "Controller.h"
 
 #include "KeyPad.h"
-#include "FacialRecognition.h"
+//#include "FacialRecognition.h"
 #include "PinHandler.h"
 #include "Logger.h"
 #include "LED.h"
@@ -45,6 +45,7 @@ void Controller::sendAlert(int event_type){
 
 }
 
+// TODO
 void Controller::processSysState(){
     switch(system_state){
         case 0:
@@ -57,12 +58,11 @@ void Controller::processSysState(){
     }
 }
 
-// TODO
 void Controller::updateTimers(){
-
+    solenoid.update();
 }
 
-// TODO
 void Controller::updateSensors(){
-
+    if(magnetic_switch.getEnabled()){magnetic_switch.measure();}
+    if(pir.getEnabled()){pir.measure();}
 }
