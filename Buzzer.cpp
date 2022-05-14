@@ -3,9 +3,10 @@
 #include "Peripheral.h"
 #include "Arduino.h"
 
-Buzzer::Buzzer(int loud_pin, int _quiet_pin){
+Buzzer::Buzzer(int loud_pin, int quiet_pin){
     io_pin = loud_pin;
-    quiet_pin = _quiet_pin;
+    this->quiet_pin = quiet_pin;
+    // Default parameters
     tone_freq = 400;
     pulse_freq = 1;
     duration = 0;

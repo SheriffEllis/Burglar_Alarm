@@ -13,7 +13,7 @@ class Buzzer : public Peripheral{
     long duration;
     long start_time;
   public:
-    Buzzer(int loud_pin, int _quiet_pin);
+    Buzzer(int loud_pin, int quiet_pin);
     void setTone(int tone_freq);
     void setPulseFreq(int pulse_freq);
     void pulsate(long duration, bool is_quiet);
