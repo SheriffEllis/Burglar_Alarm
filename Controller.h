@@ -35,6 +35,7 @@ class Controller{
       int quiet_buzz_pin, int solenoid_pin, int magswitch_pin, int PIR_pin);
     void processSysState();
     void updateTimers();
+    void updateSensors();
 };
 
 #endif // CONTROLLER_H

@@ -23,26 +23,46 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
     system_state = 0;
 }
 
+// TODO
 void Controller::armAlarm(){
 
 }
 
+// TODO
 void Controller::triggerAlarm(){
 
 }
 
 void Controller::resetAlarm(){
-
+    armed_LED.setState(false);
+    triggered_LED.setState(false);
+    buzzer.stop();
+    system_state = 0;
 }
 
+// TODO
 void Controller::sendAlert(int event_type){
 
 }
 
 void Controller::processSysState(){
+    switch(system_state){
+        case 0:
+            
+            break;
+        default:
+            Serial.println("Invalid state detected, resetting system");
+            resetAlarm();
+            break;
+    }
+}
+
+// TODO
+void Controller::updateTimers(){
 
 }
 
-void Controller::updateTimers(){
+// TODO
+void Controller::updateSensors(){
 
 }
