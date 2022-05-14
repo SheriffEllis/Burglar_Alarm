@@ -14,13 +14,15 @@ void Buzzer::setTone(int tone_freq){
     this->tone_freq = tone_freq;
 }
 
-void Buzzer::pulse(unsigned long duration, bool is_quiet = false){
+void Buzzer::pulse(unsigned long duration, bool is_quiet){
+    stop();
     int pin;
     if(is_quiet){pin = quiet_pin;}else{pin = io_pin;}
     tone(pin, tone_freq, duration);
 }
 
-void Buzzer::start(bool is_quiet = false){
+void Buzzer::start(bool is_quiet){
+    stop();
     int pin;
     if(is_quiet){pin = quiet_pin;}else{pin = io_pin;}
     tone(pin, tone_freq, TIMEOUT); // Run buzzer until the absolute upper limit (20 minutes)

@@ -6,12 +6,9 @@
 
 class Buzzer : public Peripheral{
   private:
-    static const long TIMEOUT = 3.6e+6;
+    static const long TIMEOUT = 1.2e+6;
     int quiet_pin;
     int tone_freq;
-    int pulse_freq;
-    unsigned long duration;
-    unsigned long start_time;
   public:
     Buzzer(int loud_pin, int quiet_pin);
     void setTone(int tone_freq);
