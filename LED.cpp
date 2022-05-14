@@ -8,7 +8,7 @@ LED::LED(int output_pin){
     pinMode(io_pin, OUTPUT);
 }
 
-void LED::setState(bool _state){
-    state = _state;
+void LED::setState(bool state){
+    this->state = state;
     digitalWrite(io_pin, state);
 }
