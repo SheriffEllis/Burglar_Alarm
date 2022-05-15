@@ -30,17 +30,13 @@ void Logger::logEvent(int event_type){
 void Logger::printLog(){
     Serial.println("Timestamp(s)\t: Event");
     Serial.println("--------------------------------------");
-    for (int i = 0; i < LOGGER_ARRAY_LEN; i++)
+    for (int i = 0; (i < LOGGER_ARRAY_LEN) and (!events[i].event_type == 0); i++)
     {
         Serial.print(events[i].timestamp/1000);
         Serial.print("\t\t: ");
         //TODO complete event list
         switch (events[i].event_type)
         {
-        case 0:
-            Serial.println("Null Event");
-            break;
-
         case 1:
             Serial.println("Insert Event 1");
             break;

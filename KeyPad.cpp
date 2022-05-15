@@ -14,8 +14,8 @@ void KeyPad::waitForInput(){
     }
 }
 
-void KeyPad::waitForInput(unsigned long timer_start){
-    while(!Serial.available() and (millis() - timer_start) < TIMEOUT){
+void KeyPad::waitForInput(unsigned long timer_start, unsigned long timeout){
+    while(!Serial.available() and (millis() - timer_start) < timeout){
         // wait for input with a timeout
     }
 }
@@ -39,14 +39,14 @@ int KeyPad::getPin(){
     return pin;
 }
 
-int KeyPad::getPin(unsigned long timer_start){
+int KeyPad::getPin(unsigned long timer_start, unsigned long timeout){
     bool valid = false;
     int pin = 0;
     while(!valid){
         flushSerial();
         Serial.println("Please input a 4-digit pin:");
-        waitForInput(timer_start);
-        if((millis() - timer_start) >= TIMEOUT){
+        waitForInput(timer_start, timeout);
+        if((millis() - timer_start) >= timeout){
             Serial.println("TIMEOUT EXCEEDED");
             flushSerial();
             return -1; // -1 represents failed pin entry

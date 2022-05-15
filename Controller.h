@@ -15,7 +15,9 @@
 
 class Controller{
   private:
+    const static unsigned long COUNTDOWN = 20000; // Alarm countdown is 20s
     int system_state;
+    unsigned long timer_start;
     KeyPad keypad;
     FacialRecognition facial_recognition;
     PinHandler pin_handler;
@@ -27,6 +29,7 @@ class Controller{
     PIR pir;
 
     void armAlarm();
+    bool armedCheck();
     void triggerAlarm();
     void resetAlarm();
     void sendAlert(int event_type);

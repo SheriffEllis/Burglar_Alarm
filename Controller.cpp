@@ -22,6 +22,7 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
 {
     Serial.begin(9600);
     system_state = 0;
+    timer_start = 0;
 }
 
 void Controller::armAlarm(){
@@ -39,14 +40,33 @@ void Controller::armAlarm(){
     buzzer.pulse(1000); // longer loud pulse
 }
 
+bool Controller::armedCheck(){
+    if(magnetic_switch.getState() or pir.getState() or solenoid.getState()){ // Also check status of solenoid for when facial rec succeeds
+        if(!solenoid.getState()){
+            Serial.println("Sensors triggered, 20s countdown started.");
+            Serial.println("Successful facial recognition must occur before");
+            Serial.println("PIN can be entered to stop the countdown.");
+        }
+        timer_start = millis(); // Start timer
+        buzzer.pulse(COUNTDOWN, true);
+        pin_handler.resetTries();
+        return true;
+    }
+    return false;
+}
+
 // TODO
 void Controller::triggerAlarm(){
-
+    triggered_LED.setState(true);
+    buzzer.start(); // Buzzer will stop on its own after 20 minutes
+    // TODO take log
+    // TODO send alert
 }
 
 void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
+    pin_handler.resetTries();
     buzzer.stop();
 }
 
@@ -56,15 +76,15 @@ void Controller::sendAlert(int event_type){
 }
 
 /*
+ *  TODO: add logger statements throughout
  *  0 - Initial state
  *  1 - Alarm disabled, waiting on user to log in
  *  3 - Main menu
  *  4 - Arm Alarm
- *  6 - Armed state TODO
- *  7 - Sensors triggered OR Facial recognition success TODO
- *  10 - Alarm triggered: Set off all alerts TODO
- *  11 - Waiting for PIN in triggered state TODO
- *  13 - Check sensors TODO
+ *  6 - Armed state
+ *  7 - Sensors triggered OR Facial recognition success
+ *  11 - Waiting for PIN in triggered state
+ *  13 - Check sensors and Log TODO
  *  14 - System Settings TODO
  *  15 - Setting new pin TODO
  *  16 - Setting facial recognition TODO
@@ -99,7 +119,7 @@ void Controller::processSysState(){
                         system_state = 14; // System Settings
                         break;
                     case 2:
-                        system_state = 13; // Check Sensors
+                        system_state = 13; // Check Sensors and Log
                         break;
                     case 3:
                         if(facial_recognition.getIsSetup()){
@@ -123,9 +143,36 @@ void Controller::processSysState(){
 
         case 6: // Armed state
             {
-                if(magnetic_switch.getState() or pir.getState() or solenoid.getState()){ // Also check status of solenoid for when facial rec succeeds
+                if(armedCheck()){
                     system_state = 7;
-                }    
+                }
+            }break;
+
+        case 7: // Sensors triggered OR Facial recognition success
+            {
+                if(pin_handler.getTries() > 3 or (millis() - timer_start) >= COUNTDOWN){ // If tries or timer exceeded
+                    triggerAlarm();
+                    system_state = 11; // Waiting for PIN in triggered state
+                }
+                if(solenoid.getState()){ // If facial rec succeeded, await PIN
+                    while(pin_handler.getTries() <= 3 and (millis() - timer_start) <= COUNTDOWN){ // While tries haven't been exceeded, nor timer
+                        if(pin_handler.verifyPin(keypad.getPin(timer_start, COUNTDOWN))){ // If correct pin successfully entered
+                            Serial.println("Correct PIN entered");
+                            system_state = 0; // Return to unarmed state
+                        }else{
+                            Serial.print(3 - pin_handler.getTries());
+                            Serial.println(" tries remain.");
+                        }
+                    }
+                }
+            }break;
+
+        case 11: // Waiting for PIN in triggered state
+            {
+                while(!pin_handler.verifyPin(keypad.getPin())){ // Wait for correct PIN
+                    // TODO take a log of additional failed pins
+                }
+                system_state = 0; // Return to unarmed state
             }break;
 
         default:

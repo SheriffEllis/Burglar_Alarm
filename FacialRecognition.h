@@ -1,12 +1,11 @@
 #ifndef FACIALRECOGNITION_H
 #define FACIALRECOGNITION_H
 
-#define SPECIAL_CHAR 'f' // Special ASCII character that denotes a facial rec transmission
-
 #include "Arduino.h"
 
 class FacialRecognition{
     private:
+        const static char SPECIAL_CHAR = 'f'; // Special ASCII character that denotes a facial rec transmission
         bool is_setup;
         bool pendResponse(long timeout);
     public:
