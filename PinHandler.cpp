@@ -12,8 +12,10 @@ PinHandler::PinHandler(int pin){
 
 bool PinHandler::verifyPin(int pin){
     if(stored_pin==pin){
+        Serial.println("CORRECT PIN");
         return true;
     }else{
+        Serial.println("INCORRECT PIN");
         tries++;
         return false;
     }

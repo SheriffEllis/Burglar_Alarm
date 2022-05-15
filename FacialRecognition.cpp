@@ -10,7 +10,12 @@ bool FacialRecognition::pendResponse(long timeout){
 }
 
 void FacialRecognition::setup(){
-    is_setup = true;
+    is_setup = addFace();
+    if(is_setup){
+        Serial.println("Facial Recognition successfully set up.");
+    }else{
+        Serial.println("Failed to set up Facial Recognition, please try again.");
+    }
 }
 
 bool FacialRecognition::getIsSetup(){
@@ -29,15 +34,14 @@ bool FacialRecognition::resetFaces(){
 bool FacialRecognition::checkFace(){
     char codeChar = Serial.peek();
     if(codeChar == SPECIAL_CHAR){
-        Serial.read(); // dump codeChar
-        char decision = Serial.read(); // Should be y or n
-        Serial.flush();
-        if(decision == 'y'){
+        String message = Serial.readString();
+        if(message == "fy"){
             Serial.println("Valid Face Detected");
             return true;
         }else{
             Serial.println("Failed to Detect a Valid Face");
         }
+        Serial.flush();
     }
     return false; // otherwise return false
 }

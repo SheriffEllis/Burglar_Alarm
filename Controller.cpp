@@ -11,6 +11,7 @@
 #include "MagneticSwitch.h"
 #include "PIR.h"
 
+
 Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_pin,
     int quiet_buzz_pin, int solenoid_pin, int magswitch_pin, int PIR_pin):
         armed_LED(armed_LED_pin),
@@ -20,22 +21,24 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
         magnetic_switch(magswitch_pin),
         pir(PIR_pin)
 {
-    Serial.begin(9600);
     system_state = 0;
     timer_start = 0;
 }
 
 void Controller::armAlarm(){
-    armed_LED.setState(true);
-    Serial.println("Arming alarm system...\n1 minute countdown begun");
+    Serial.println("Arming alarm system...\n20 second countdown begun");
+    solenoid.open(); // Open door until end of countdown
     buzzer.setTone(400);
-    for (int i = 60; i >= 0; i--)
+    for (int i = 20; i >= 0; i--) // Should be 1 minute but set to 20 seconds for demo
     {
         Serial.print(i);
         Serial.println("s");
         buzzer.pulse(500, true); // quiet short pulses
         delay(1000);
     }
+    Serial.println("System Armed.");
+    armed_LED.setState(true);
+    solenoid.close(); // Redundant backup
     buzzer.setTone(1000);
     buzzer.pulse(1000); // longer loud pulse
 }
@@ -66,6 +69,7 @@ void Controller::triggerAlarm(){
 void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
+    solenoid.close();
     pin_handler.resetTries();
     buzzer.stop();
 }
@@ -100,8 +104,8 @@ void Controller::processSysState(){
 
         case 1: // Alarm disabled, waiting on user to log in
             {
-                Serial.println("Pin must be re-entered to continue");
-                Serial.println("No limit to number of attempts.");
+                Serial.println("your PIN must be re-entered to continue");
+                Serial.println("There is no limit to the number of attempts.");
                 if(pin_handler.verifyPin(keypad.getPin())){
                     system_state = 3; // Main menu
                 };
@@ -110,7 +114,7 @@ void Controller::processSysState(){
 
         case 3: // Main menu
             {
-                int choice = keypad.getChoice("0 - Back\n1 - System Setting\n2 - Check Sensors\n3 - Arm Alarm", 3);
+                int choice = keypad.getChoice("0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Arm Alarm", 3);
                 switch(choice){
                     case 0:
                         system_state = 0; // Initial state
@@ -157,9 +161,10 @@ void Controller::processSysState(){
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
                     while(pin_handler.getTries() <= 3 and (millis() - timer_start) <= COUNTDOWN){ // While tries haven't been exceeded, nor timer
                         if(pin_handler.verifyPin(keypad.getPin(timer_start, COUNTDOWN))){ // If correct pin successfully entered
-                            Serial.println("Correct PIN entered");
                             system_state = 0; // Return to unarmed state
+                            return;
                         }else{
+                            // Display number of tries left
                             Serial.print(3 - pin_handler.getTries());
                             Serial.println(" tries remain.");
                         }
@@ -175,6 +180,14 @@ void Controller::processSysState(){
                 system_state = 0; // Return to unarmed state
             }break;
 
+        case 16: // Setting up facial recognition
+            {
+                facial_recognition.setup();
+                if(facial_recognition.getIsSetup()){
+                    system_state = 3; // Return to Main Menu
+                }
+            }break;
+
         default:
             {
                 Serial.println("Invalid state detected, resetting system");
@@ -183,15 +196,11 @@ void Controller::processSysState(){
     }
 }
 
-void Controller::updateTimers(){
-    solenoid.update();
-}
-
 void Controller::updateSensors(){
     if(magnetic_switch.getEnabled()){magnetic_switch.measure();}
     if(pir.getEnabled()){pir.measure();}
 
     if(facial_recognition.checkFace()){
-        solenoid.open(60000); // Milliseconds in 1 minute
+        solenoid.open(); // Will remain open until pin successfully entered or alarm triggered
     }
 }
