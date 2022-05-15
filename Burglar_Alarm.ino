@@ -13,7 +13,21 @@ Controller controller(ARMED_LED_PIN, TRIGGERED_LED_PIN,
     LOUD_BUZZ_PIN, QUIET_BUZZ_PIN, SOLENOID_PIN, MAGSWITCH_PIN, PIR_PIN);
 
 void setup(){
+  
+  //Code for the interfacing of the serial monitor & matlab will be marked
+  Serial.begin(9600);
+  int start = 0;
+
+  //Reads what MATLAB sends 
+while(start != 1){    //keep looping until a 1 is sent from Matlab
+      if(Serial.available() > 0){
+          //Read character
+         start = Serial.read();
+      }  //end if
+} //end while
+
 }
+
 
 void loop(){
   controller.processSysState();
