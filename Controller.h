@@ -4,7 +4,7 @@
 #include "Arduino.h"
 
 #include "KeyPad.h"
-//#include "FacialRecognition.h"
+#include "FacialRecognition.h"
 #include "PinHandler.h"
 #include "Logger.h"
 #include "LED.h"
@@ -17,7 +17,7 @@ class Controller{
   private:
     int system_state;
     KeyPad keypad;
-    //FacialRecognition facial_recognition;
+    FacialRecognition facial_recognition;
     PinHandler pin_handler;
     Logger logger;
     LED armed_LED, triggered_LED;

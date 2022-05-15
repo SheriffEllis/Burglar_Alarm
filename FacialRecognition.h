@@ -1,6 +1,8 @@
 #ifndef FACIALRECOGNITION_H
 #define FACIALRECOGNITION_H
 
+#define SPECIAL_CHAR 'f' // Special ASCII character that denotes a facial rec transmission
+
 #include "Arduino.h"
 
 class FacialRecognition{
@@ -12,6 +14,7 @@ class FacialRecognition{
         void setup();
         bool getIsSetup();
         bool addFace();
+        bool resetFaces();
         bool checkFace();
 };
 
