@@ -4,7 +4,7 @@
 #include "Arduino.h"
 
 #include "KeyPad.h"
-//#include "FacialRecognition.h"
+#include "FacialRecognition.h"
 #include "PinHandler.h"
 #include "Logger.h"
 #include "LED.h"
@@ -15,9 +15,11 @@
 
 class Controller{
   private:
+    const static unsigned long COUNTDOWN = 20000; // Alarm countdown is 20s
     int system_state;
+    unsigned long timer_start;
     KeyPad keypad;
-    //FacialRecognition facial_recognition;
+    FacialRecognition facial_recognition;
     PinHandler pin_handler;
     Logger logger;
     LED armed_LED, triggered_LED;
@@ -27,6 +29,7 @@ class Controller{
     PIR pir;
 
     void armAlarm();
+    bool armedCheck();
     void triggerAlarm();
     void resetAlarm();
     void sendAlert(int event_type);
