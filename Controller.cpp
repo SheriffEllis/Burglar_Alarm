@@ -29,7 +29,7 @@ void Controller::armAlarm(){
     Serial.println("Arming alarm system...\n20 second countdown begun");
     solenoid.open(); // Open door until end of countdown
     buzzer.setTone(400);
-    for (int i = 20; i >= 0; i--) // Should be 1 minute but set to 20 seconds for demo
+    for (int i = 20; i >= 0; i--) // TODO: update timer for demo
     {
         Serial.print(i);
         Serial.println("s");
@@ -38,7 +38,7 @@ void Controller::armAlarm(){
     }
     Serial.println("System Armed.");
     armed_LED.setState(true);
-    solenoid.close(); // Redundant backup
+    solenoid.close();
     buzzer.setTone(1000);
     buzzer.pulse(1000); // longer loud pulse
 }
@@ -72,6 +72,7 @@ void Controller::resetAlarm(){
     solenoid.close();
     pin_handler.resetTries();
     buzzer.stop();
+    logger.logEvent(Event::alarmReset);
 }
 
 // TODO

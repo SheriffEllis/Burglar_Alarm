@@ -5,8 +5,15 @@
 
 #include "Arduino.h"
 
+enum class Event{
+  nullEvent,
+  alarmReset,
+  failedLogin,
+  successfulLogin
+};
+
 struct EventTime{
-    int event_type;
+    Event event_type;
     long timestamp;
 };
 
@@ -16,7 +23,7 @@ class Logger{
     void pushQueue();
   public:
     Logger();
-    void logEvent(int event_type);
+    void logEvent(Event event_type);
     void printLog();
 };
 

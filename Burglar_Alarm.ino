@@ -15,6 +15,7 @@ void setup(){
   Serial.begin(9600);
   Serial.println("Initialised");
   Serial.println("Please wait while PIR sensor calibrates...");
+  // TODO: update timer
   for (int i = 2; i > 0; i--) // wait 20 seconds
   {
     Serial.println(i);

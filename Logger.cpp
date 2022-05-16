@@ -6,7 +6,7 @@ Logger::Logger(){
     //Fill the array with event_type 0 and timestamp 0
     for (int i = 0; i < LOGGER_ARRAY_LEN; i++)
     {
-        events[i].event_type = 0;
+        events[i].event_type = Event::nullEvent;
         events[i].timestamp = 0;
     }    
 }
@@ -17,11 +17,11 @@ void Logger::pushQueue(){
     {
         events[i] = events[i-1];
     }
-    events[0].event_type = 0;
+    events[0].event_type = Event::nullEvent;
     events[0].timestamp = 0;
 }
 
-void Logger::logEvent(int event_type){
+void Logger::logEvent(Event event_type){
     pushQueue();
     events[0].event_type = event_type;
     events[0].timestamp = millis();
@@ -30,23 +30,23 @@ void Logger::logEvent(int event_type){
 void Logger::printLog(){
     Serial.println("Timestamp(s)\t: Event");
     Serial.println("--------------------------------------");
-    for (int i = 0; (i < LOGGER_ARRAY_LEN) and (!events[i].event_type == 0); i++)
+    for (int i = 0; (i < LOGGER_ARRAY_LEN) and (events[i].event_type != Event::nullEvent); i++)
     {
         Serial.print(events[i].timestamp/1000);
         Serial.print("\t\t: ");
         //TODO complete event list
         switch (events[i].event_type)
         {
-        case 1:
-            Serial.println("Insert Event 1");
+        case Event::alarmReset:
+            Serial.println("Alarm Reset");
             break;
 
-        case 2:
-            Serial.println("Insert Event 2");
+        case Event::failedLogin:
+            Serial.println("Failed Login");
             break;
 
-        case 3:
-            Serial.println("Insert Event 3");
+        case Event::successfulLogin:
+            Serial.println("Successful Login");
             break;
         
         default:
