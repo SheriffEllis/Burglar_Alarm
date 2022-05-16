@@ -37,6 +37,7 @@ void Controller::armAlarm(){
         delay(1000);
     }
     Serial.println("System Armed.");
+    Serial.println("(Type \"-f\" to simulate matlab input of recognised face)");
     armed_LED.setState(true);
     solenoid.close();
     buzzer.setTone(1000);
@@ -77,7 +78,7 @@ void Controller::resetAlarm(){
 }
 
 // TODO
-void Controller::sendAlert(int event_type){
+void Controller::sendAlert(){
 
 }
 
@@ -88,7 +89,7 @@ void Controller::sendAlert(int event_type){
  *  3 - Main menu
  *  4 - Arm Alarm
  *  6 - Armed state
- *  7 - Sensors triggered OR Facial recognition success
+ *  7 - COUNTDOWN state: Sensors triggered OR Facial recognition success
  *  11 - Waiting for PIN in triggered state
  *  13 - Check sensors and Log TODO
  *  14 - System Settings TODO
@@ -110,8 +111,10 @@ void Controller::processSysState(){
                 Serial.println("There is no limit to the number of attempts.");
                 if(pin_handler.verifyPin(keypad.getPin())){
                     system_state = 3; // Main menu
+                }else{
+                    logger.logEvent(Event::failedLogin);
                 };
-                pin_handler.resetTries(); // Incorrect pin entry, try again (main loop)
+                pin_handler.resetTries(); // Unlimited PIN entry attempts
             }break;
 
         case 3: // Main menu
@@ -150,15 +153,15 @@ void Controller::processSysState(){
         case 6: // Armed state
             {
                 if(armedCheck()){
-                    system_state = 7;
+                    system_state = 7; // COUNTDOWN state: Sensors triggered OR Facial recognition success
                 }
             }break;
 
-        case 7: // Sensors triggered OR Facial recognition success
+        case 7: // COUNTDOWN state: Sensors triggered OR Facial recognition success
             {
                 if(pin_handler.getTries() > 3 or (millis() - timer_start) >= COUNTDOWN){ // If tries or timer exceeded
                     triggerAlarm();
-                    system_state = 11; // Waiting for PIN in triggered state
+                    system_state = 11; // Waiting for PIN in alarm triggered state
                 }
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
                     while(pin_handler.getTries() <= 3 and (millis() - timer_start) < COUNTDOWN){ // While tries haven't been exceeded, nor timer
@@ -174,10 +177,11 @@ void Controller::processSysState(){
                 }
             }break;
 
-        case 11: // Waiting for PIN in triggered state
+        case 11: // Waiting for PIN in alarm triggered state
             {
+                Serial.println("Enter the correct PIN to disable the alarm");
                 while(!pin_handler.verifyPin(keypad.getPin())){ // Wait for correct PIN
-                    // TODO take a log of additional failed pins
+                    logger.logEvent(Event::failedLogin);
                 }
                 system_state = 0; // Return to unarmed state
             }break;
@@ -187,6 +191,12 @@ void Controller::processSysState(){
                 facial_recognition.setup();
                 if(facial_recognition.getIsSetup()){
                     system_state = 3; // Return to Main Menu
+                }else{
+                    Serial.println("Failed to set up facial recognition.");
+                    if(keypad.getChoice("0 - Try again\n1 - Cancel",1)){
+                        // If user chooses to cancel (1 = true) return to main menu
+                        system_state = 3;
+                    } // Otherwise try again via main loop
                 }
             }break;
 
@@ -199,10 +209,20 @@ void Controller::processSysState(){
 }
 
 void Controller::updateSensors(){
-    if(magnetic_switch.getEnabled()){magnetic_switch.measure();}
-    if(pir.getEnabled()){pir.measure();}
+    if(magnetic_switch.getEnabled()){ // Only take a measurement if the sensor is enabled
+        if(magnetic_switch.measure()){ // Log if sensor gets a positive reading
+            logger.logEvent(Event::magswitchTrigger);
+        }
+    }
+    if(pir.getEnabled()){ // Only take a measurement if the sensor is enabled
+        if(pir.measure()){ // Log if sensor gets a positive reading
+            logger.logEvent(Event::pirTrigger);
+        }
+    }
 
     if(facial_recognition.checkFace()){
         solenoid.open(); // Will remain open until pin successfully entered or alarm triggered
+        logger.logEvent(Event::solenoidOpened);
     }
+    keypad.flushSerial();
 }

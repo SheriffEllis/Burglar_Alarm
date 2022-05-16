@@ -9,7 +9,11 @@ enum class Event{
   nullEvent,
   alarmReset,
   failedLogin,
-  successfulLogin
+  successfulLogin,
+  magswitchTrigger,
+  pirTrigger,
+  solenoidOpened,
+  solenoidClosed
 };
 
 struct EventTime{

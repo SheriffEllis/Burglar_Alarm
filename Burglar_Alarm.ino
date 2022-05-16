@@ -1,3 +1,6 @@
+// TODO: add header comments to all class headers
+// TODO: add function descriptions to all functions
+
 #include "Arduino.h"
 #include "Controller.h"
 
@@ -22,7 +25,6 @@ void setup(){
     delay(1000);
   }
 }
-
 
 void loop(){
   controller.processSysState();
