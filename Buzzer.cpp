@@ -21,6 +21,7 @@ void Buzzer::pulse(unsigned long duration, bool is_quiet){
     tone(pin, tone_freq, duration);
 }
 
+// TODO: set a varible timeout (with max of 1.2e+6)
 void Buzzer::start(bool is_quiet){
     stop();
     int pin;

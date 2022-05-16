@@ -13,7 +13,8 @@ enum class Event{
   magswitchTrigger,
   pirTrigger,
   solenoidOpened,
-  solenoidClosed
+  solenoidClosed,
+  alarmTriggered
 };
 
 struct EventTime{

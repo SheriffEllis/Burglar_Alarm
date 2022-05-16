@@ -25,6 +25,7 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
     timer_start = 0;
 }
 
+// prepares system to be put into the armed state and starts a countdown for user to leave
 void Controller::armAlarm(){
     Serial.println("Arming alarm system...\n20 second countdown begun");
     solenoid.open(); // Open door until end of countdown
@@ -44,12 +45,13 @@ void Controller::armAlarm(){
     buzzer.pulse(1000); // longer loud pulse
 }
 
+// function run on loop when armed to check the status of sensors and facial rec
 bool Controller::armedCheck(){
     if(magnetic_switch.getState() or pir.getState() or solenoid.getState()){ // Also check status of solenoid for when facial rec succeeds
         if(!solenoid.getState()){
-            Serial.println("Sensors triggered, 20s countdown started.");
-            Serial.println("Successful facial recognition must occur before");
-            Serial.println("PIN can be entered to stop the countdown.");
+            Serial.println("Sensors triggered, 20s countdown started."); // TODO update timer
+            Serial.println("Successful FACIAL RECOGNITION must occur BEFORE pin");
+            Serial.println("can be entered to stop the countdown.");
         }
         timer_start = millis(); // Start timer
         buzzer.pulse(COUNTDOWN, true);
@@ -59,15 +61,16 @@ bool Controller::armedCheck(){
     return false;
 }
 
-// TODO
+// sequence of events after alarm has been fully triggered and not cancelled before the countdown
 void Controller::triggerAlarm(){
     triggered_LED.setState(true);
     buzzer.start(); // Buzzer will stop on its own after 20 minutes
     Serial.println("ALARM TRIGGERED");
-    // TODO take log
-    // TODO send alert
+    logger.logEvent(Event::alarmTriggered);
+    sendAlert();
 }
 
+// resets outputs to initial state (except settings such as facial rec, pin, etc)
 void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
@@ -77,13 +80,15 @@ void Controller::resetAlarm(){
     logger.logEvent(Event::alarmReset);
 }
 
-// TODO
+// largely placeholder function for outputting to monitoring station hardware
 void Controller::sendAlert(){
-
+    Serial.println("Monitoring Station Alerted.");
 }
 
 /*
  *  TODO: add logger statements throughout
+ *  state values decided on from UML state diagram
+ *  some states were redundant in implementation, resulting in unused numbers
  *  0 - Initial state
  *  1 - Alarm disabled, waiting on user to log in
  *  3 - Main menu
@@ -91,7 +96,8 @@ void Controller::sendAlert(){
  *  6 - Armed state
  *  7 - COUNTDOWN state: Sensors triggered OR Facial recognition success
  *  11 - Waiting for PIN in triggered state
- *  13 - Check sensors and Log TODO
+ *  12 - Check Log TODO
+ *  13 - Check Sensors TODO
  *  14 - System Settings TODO
  *  15 - Setting new pin TODO
  *  16 - Setting facial recognition TODO
@@ -119,7 +125,7 @@ void Controller::processSysState(){
 
         case 3: // Main menu
             {
-                int choice = keypad.getChoice("0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Arm Alarm", 3);
+                int choice = keypad.getChoice("0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Check Log\n4 - Arm Alarm", 4);
                 switch(choice){
                     case 0:
                         system_state = 0; // Initial state
@@ -128,9 +134,13 @@ void Controller::processSysState(){
                         system_state = 14; // System Settings
                         break;
                     case 2:
-                        system_state = 13; // Check Sensors and Log
+                        system_state = 13; // Check Sensors
                         break;
-                    case 3:
+                    case 3: // Check log (doesn't require a separate state)
+                        logger.printLog();
+                        // Will return to main menu automatically
+                        break;
+                    case 4:
                         if(facial_recognition.getIsSetup()){
                             system_state = 4; // Arm Alarm
                         }else{
@@ -184,6 +194,11 @@ void Controller::processSysState(){
                     logger.logEvent(Event::failedLogin);
                 }
                 system_state = 0; // Return to unarmed state
+            }break;
+
+        case 13: // Check Sensors TODO
+            {
+
             }break;
 
         case 16: // Setting up facial recognition

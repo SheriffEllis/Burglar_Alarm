@@ -28,11 +28,12 @@ void Logger::logEvent(Event event_type){
 }
 
 void Logger::printLog(){
-    Serial.println("Timestamp(s)\t: Event");
+    Serial.println("\nSYSTEM EVENT LOG:");
+    Serial.println("Time (sec ago)\t: Event");
     Serial.println("--------------------------------------");
     for (int i = 0; (i < LOGGER_ARRAY_LEN) and (events[i].event_type != Event::nullEvent); i++)
     {
-        Serial.print(events[i].timestamp/1000);
+        Serial.print((millis() - events[i].timestamp)/1000); // Calculate how long ago
         Serial.print("\t\t: ");
         //TODO complete event list
         switch (events[i].event_type)
@@ -48,7 +49,27 @@ void Logger::printLog(){
         case Event::successfulLogin:
             Serial.println("Successful Login");
             break;
+
+        case Event::magswitchTrigger:
+            Serial.println("Magnetic Switch Triggered");
+            break;
+
+        case Event::pirTrigger:
+            Serial.println("PIR Sensor Triggered");
+            break;
+
+        case Event::solenoidOpened:
+            Serial.println("Door Solenoid Opened");
+            break;
+
+        case Event::solenoidClosed:
+            Serial.println("Door Solenoid Closed");
+            break;
         
+        case Event::alarmTriggered:
+            Serial.println("Alarm Triggered");
+            break;
+
         default:
             Serial.println("Invalid Event");
             break;
