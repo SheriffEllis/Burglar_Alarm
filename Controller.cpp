@@ -62,6 +62,7 @@ bool Controller::armedCheck(){
 void Controller::triggerAlarm(){
     triggered_LED.setState(true);
     buzzer.start(); // Buzzer will stop on its own after 20 minutes
+    Serial.println("ALARM TRIGGERED");
     // TODO take log
     // TODO send alert
 }
@@ -160,11 +161,11 @@ void Controller::processSysState(){
                     system_state = 11; // Waiting for PIN in triggered state
                 }
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
-                    while(pin_handler.getTries() <= 3 and (millis() - timer_start) <= COUNTDOWN){ // While tries haven't been exceeded, nor timer
+                    while(pin_handler.getTries() <= 3 and (millis() - timer_start) < COUNTDOWN){ // While tries haven't been exceeded, nor timer
                         if(pin_handler.verifyPin(keypad.getPin(timer_start, COUNTDOWN))){ // If correct pin successfully entered
                             system_state = 0; // Return to unarmed state
                             return;
-                        }else{
+                        }else if((millis() - timer_start) < COUNTDOWN){ // If timer exceeded, skip this
                             // Display number of tries left
                             Serial.print(3 - pin_handler.getTries());
                             Serial.println(" tries remain.");
