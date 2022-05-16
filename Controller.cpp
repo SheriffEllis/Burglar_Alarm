@@ -125,7 +125,8 @@ void Controller::processSysState(){
 
         case 3: // Main menu
             {
-                int choice = keypad.getChoice("0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Check Log\n4 - Arm Alarm", 4);
+                Serial.println("0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Check Log\n4 - Arm Alarm");
+                int choice = keypad.getChoice(4);
                 switch(choice){
                     case 0:
                         system_state = 0; // Initial state
@@ -136,9 +137,8 @@ void Controller::processSysState(){
                     case 2:
                         system_state = 13; // Check Sensors
                         break;
-                    case 3: // Check log (doesn't require a separate state)
-                        logger.printLog();
-                        // Will return to main menu automatically
+                    case 3:
+                        system_state = 12; // Check Log
                         break;
                     case 4:
                         if(facial_recognition.getIsSetup()){
@@ -176,12 +176,14 @@ void Controller::processSysState(){
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
                     while(pin_handler.getTries() <= 3 and (millis() - timer_start) < COUNTDOWN){ // While tries haven't been exceeded, nor timer
                         if(pin_handler.verifyPin(keypad.getPin(timer_start, COUNTDOWN))){ // If correct pin successfully entered
+                            logger.logEvent(Event::successfulLogin);
                             system_state = 0; // Return to unarmed state
                             return;
                         }else if((millis() - timer_start) < COUNTDOWN){ // If timer exceeded, skip this
                             // Display number of tries left
                             Serial.print(3 - pin_handler.getTries());
                             Serial.println(" tries remain.");
+                            logger.logEvent(Event::failedLogin);
                         }
                     }
                 }
@@ -196,6 +198,12 @@ void Controller::processSysState(){
                 system_state = 0; // Return to unarmed state
             }break;
 
+        case 12: // Check Log
+            {
+                logger.printLog();
+                system_state = 3; // Return to main menu
+            }break;
+
         case 13: // Check Sensors TODO
             {
 
@@ -208,7 +216,8 @@ void Controller::processSysState(){
                     system_state = 3; // Return to Main Menu
                 }else{
                     Serial.println("Failed to set up facial recognition.");
-                    if(keypad.getChoice("0 - Try again\n1 - Cancel",1)){
+                    Serial.println("0 - Try again\n1 - Cancel");
+                    if(keypad.getChoice(1)){
                         // If user chooses to cancel (1 = true) return to main menu
                         system_state = 3;
                     } // Otherwise try again via main loop

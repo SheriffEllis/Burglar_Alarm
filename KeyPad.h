@@ -11,7 +11,7 @@ class KeyPad{
         void flushSerial();
         int getPin();
         int getPin(unsigned long timer_start, unsigned long timeout);
-        int getChoice(String choices, int max_choice_num);
+        int getChoice(int max_choice_num);
 };
 
 #endif

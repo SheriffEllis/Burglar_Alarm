@@ -67,15 +67,13 @@ int KeyPad::getPin(unsigned long timer_start, unsigned long timeout){
     return pin;
 }
 
-int KeyPad::getChoice(String choices, int max_choice_num){
+int KeyPad::getChoice(int max_choice_num){
     bool valid = false;
     char choice;
     while(!valid){
-        flushSerial();
-        Serial.println();
-        Serial.println(choices);
         Serial.print("\nChoose an option by inputting a digit from 0 to ");
         Serial.println(max_choice_num);
+        flushSerial();
         waitForInput();
         choice = Serial.read();
         if(choice < '0' or choice > '0' + max_choice_num){
