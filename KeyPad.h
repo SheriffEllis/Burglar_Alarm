@@ -5,10 +5,10 @@
 
 class KeyPad{
     private:
-        void flushSerial();
         void waitForInput();
         void waitForInput(unsigned long timer_start, unsigned long timeout);
     public:
+        void flushSerial();
         int getPin();
         int getPin(unsigned long timer_start, unsigned long timeout);
         int getChoice(String choices, int max_choice_num);

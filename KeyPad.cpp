@@ -1,22 +1,26 @@
 #include "Arduino.h"
 #include "KeyPad.h"
 
+// empties the serial input and output buffer
+// Serial.flush alone doesn't do what I need this to do
 void KeyPad::flushSerial(){
     Serial.flush();
     while(Serial.available()){
-        Serial.read(); // Serial.flush alone wont work but this did
+        Serial.read();
     }
 }
 
+// wait for input without a timeout
 void KeyPad::waitForInput(){
     while(!Serial.available()){
-        // wait for input without a timeout
+        // Do nothing
     }
 }
 
+// wait for input with a timeout
 void KeyPad::waitForInput(unsigned long timer_start, unsigned long timeout){
     while(!Serial.available() and (millis() - timer_start) < timeout){
-        // wait for input with a timeout
+        // Do nothing
     }
 }
 
@@ -25,7 +29,7 @@ int KeyPad::getPin(){
     int pin = 0;
     while(!valid){
         flushSerial();
-        Serial.println("Please input a 4-digit pin:");
+        Serial.println("\nPlease input a 4-digit pin:");
         waitForInput();
         pin = Serial.parseInt();
         if(pin == 0 or pin > 9999){
@@ -44,7 +48,7 @@ int KeyPad::getPin(unsigned long timer_start, unsigned long timeout){
     int pin = 0;
     while(!valid){
         flushSerial();
-        Serial.println("Please input a 4-digit pin:");
+        Serial.println("\nPlease input a 4-digit pin:");
         waitForInput(timer_start, timeout);
         if((millis() - timer_start) >= timeout){
             Serial.println("TIMEOUT EXCEEDED");
@@ -68,8 +72,9 @@ int KeyPad::getChoice(String choices, int max_choice_num){
     char choice;
     while(!valid){
         flushSerial();
+        Serial.println();
         Serial.println(choices);
-        Serial.print("Choose an option by inputting a digit from 0 to ");
+        Serial.print("\nChoose an option by inputting a digit from 0 to ");
         Serial.println(max_choice_num);
         waitForInput();
         choice = Serial.read();
@@ -81,5 +86,5 @@ int KeyPad::getChoice(String choices, int max_choice_num){
         }
     }
     flushSerial();
-    return choice-'0';
+    return choice-'0'; // Convert number char to int
 }

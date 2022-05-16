@@ -5,7 +5,7 @@
 
 class FacialRecognition{
     private:
-        const static char SPECIAL_CHAR = 'f'; // Special ASCII character that denotes a facial rec transmission
+        const static char SPECIAL_CHAR = '-'; // Special ASCII character that denotes a facial rec transmission
         bool is_setup;
         bool pendResponse(long timeout);
     public:

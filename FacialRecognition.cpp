@@ -32,16 +32,17 @@ bool FacialRecognition::resetFaces(){
 }
 
 bool FacialRecognition::checkFace(){
-    char codeChar = Serial.peek();
-    if(codeChar == SPECIAL_CHAR){
-        String message = Serial.readString();
-        if(message == "fy"){
-            Serial.println("Valid Face Detected");
-            return true;
-        }else{
-            Serial.println("Failed to Detect a Valid Face");
+    if(Serial.available()){
+        char codeChar = Serial.peek();
+        if(codeChar == SPECIAL_CHAR){
+            String message = Serial.readString();
+            if(message[1] == 'f'){
+                Serial.println("Valid Face Detected");
+                return true;
+            }else{
+                Serial.println("Failed to Detect a Valid Face");
+            }
         }
-        Serial.flush();
     }
     return false; // otherwise return false
 }
