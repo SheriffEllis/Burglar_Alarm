@@ -21,6 +21,7 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
         magnetic_switch(magswitch_pin),
         pir(PIR_pin)
 {
+    countdown = 60000; // 1 minute by default
     system_state = 0;
     timer_start = 0;
 }
@@ -51,13 +52,15 @@ void Controller::armAlarm(){
 bool Controller::armedCheck(){
     if(magnetic_switch.getState() or pir.getState() or solenoid.getState()){ // Also check status of solenoid for when facial rec succeeds
         if(!solenoid.getState()){
-            Serial.println("Sensors triggered, 20s countdown started."); // TODO update timer
+            Serial.print("Sensors triggered, ");
+            Serial.print(countdown);
+            Serial.println("s started.");
             Serial.println("Successful FACIAL RECOGNITION must occur BEFORE pin");
             Serial.println("can be entered to stop the countdown.");
         }
         timer_start = millis(); // Start timer
         buzzer.setTone(400);
-        buzzer.pulse(COUNTDOWN, true);
+        buzzer.pulse(countdown, true);
         pin_handler.resetTries();
         return true;
     }
@@ -77,8 +80,8 @@ void Controller::triggerAlarm(){
 void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
+    if(solenoid.getState()){logger.logEvent(Event::solenoidClosed);} // Only record closing if was open to begin with
     solenoid.close();
-    logger.logEvent(Event::solenoidClosed);
     pin_handler.resetTries();
     buzzer.stop();
     logger.logEvent(Event::alarmReset);
@@ -89,7 +92,6 @@ void Controller::sendAlert(){
     Serial.println("Monitoring Station Alerted.");
 }
 
-//FIXME
 // Displays status of sensors to serial monitor (for menu option)
 void Controller::displaySensors(){
     Serial.println("\n--------------------------------");
@@ -124,7 +126,6 @@ void Controller::displaySensors(){
 }
 
 /*
- *  TODO: add logger statements throughout
  *  state values decided on from UML state diagram
  *  some states were redundant in implementation, resulting in unused numbers
  *  0 - Initial state
@@ -132,13 +133,15 @@ void Controller::displaySensors(){
  *  3 - Main menu
  *  4 - Arm Alarm
  *  6 - Armed state
- *  7 - COUNTDOWN state: Sensors triggered OR Facial recognition success
+ *  7 - countdown state: Sensors triggered OR Facial recognition success
  *  11 - Waiting for PIN in triggered state
  *  12 - Check Log
- *  13 - Check Sensors FIXME
- *  14 - System Settings TODO
- *  15 - Setting new pin TODO
+ *  13 - Check Sensors
+ *  14 - System Settings
+ *  15 - Setting new pin
  *  16 - Setting facial recognition
+ *  17 - Change Buzzer Timeout
+ *  18 - Change Alarm Countdown
  */
 void Controller::processSysState(){
     switch(system_state){
@@ -201,23 +204,23 @@ void Controller::processSysState(){
         case 6: // Armed state
             {
                 if(armedCheck()){
-                    system_state = 7; // COUNTDOWN state: Sensors triggered OR Facial recognition success
+                    system_state = 7; // countdown state: Sensors triggered OR Facial recognition success
                 }
             }break;
 
-        case 7: // COUNTDOWN state: Sensors triggered OR Facial recognition success
+        case 7: // countdown state: Sensors triggered OR Facial recognition success
             {
-                if(pin_handler.getTries() > 3 or (millis() - timer_start) >= COUNTDOWN){ // If tries or timer exceeded
+                if(pin_handler.getTries() > 3 or (millis() - timer_start) >= countdown){ // If tries or timer exceeded
                     triggerAlarm();
                     system_state = 11; // Waiting for PIN in alarm triggered state
                 }
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
-                    while(pin_handler.getTries() <= 3 and (millis() - timer_start) < COUNTDOWN){ // While tries haven't been exceeded, nor timer
-                        if(pin_handler.verifyPin(keypad.getPin(timer_start, COUNTDOWN))){ // If correct pin successfully entered
+                    while(pin_handler.getTries() <= 3 and (millis() - timer_start) < countdown){ // While tries haven't been exceeded, nor timer
+                        if(pin_handler.verifyPin(keypad.getPin(timer_start, countdown))){ // If correct pin successfully entered
                             logger.logEvent(Event::successfulLogin);
                             system_state = 0; // Return to unarmed state
                             return;
-                        }else if((millis() - timer_start) < COUNTDOWN){ // If timer exceeded, skip this
+                        }else if((millis() - timer_start) < countdown){ // If timer exceeded, skip this
                             // Display number of tries left
                             Serial.print(3 - pin_handler.getTries());
                             Serial.println(" tries remain.");
@@ -242,10 +245,52 @@ void Controller::processSysState(){
                 system_state = 3; // Return to main menu
             }break;
 
-        case 13: // Check Sensors FIXME
+        case 13: // Check Sensors
             {
                 displaySensors();
                 system_state = 3; // Return to Main Menu
+            }break;
+
+        case 14: // System Settings
+            {
+                Serial.println("0 - Back\n1 - Change PIN\n2 - Setup Facial Recognition\n3 - Change Buzzer Timeout\n4 - Change Alarm Countdown");
+                int choice = keypad.getChoice(4);
+                switch(choice){
+                    case 0:
+                        system_state = 3; // Return to Main Menu
+                        break;
+                    case 1:
+                        system_state = 15; // Setting new pin
+                        break;
+                    case 2:
+                        system_state = 16; // Setting up facial recognition
+                        break;
+                    case 3:
+                        system_state = 17; // Change Buzzer Timeout
+                        break;
+                    case 4:
+                        system_state = 18; // Change Alarm Countdown
+                        break;
+                    default:
+                        system_state = 0;
+                        break;
+                }
+            }break;
+
+        case 15: // Setting new pin
+            {
+                Serial.println("Input your OLD pin:");
+                if(pin_handler.verifyPin(keypad.getPin())){
+                    Serial.println("Input the NEW pin:");
+                    pin_handler.setPin(keypad.getPin());
+                    system_state = 14;
+                }else{
+                    Serial.println("0 - Try again\n1 - Go back");
+                    if(keypad.getChoice(1)){ // If 1 is choosen this is equivalent to boolean true
+                        system_state = 14; // System Settings
+                    }
+                }
+                pin_handler.resetTries();
             }break;
 
         case 16: // Setting up facial recognition
@@ -261,6 +306,26 @@ void Controller::processSysState(){
                         system_state = 3;
                     } // Otherwise try again via main loop
                 }
+            }break;
+
+        case 17: // Change Buzzer Timeout
+            {
+                Serial.print("Previous buzzer timeout was set to ");
+                Serial.print((buzzer.getTimeout()/1000)/60);
+                Serial.println("m");
+                Serial.println("Input a new timeout in minutes:");
+                buzzer.setTimeout((unsigned long)keypad.getNumber(20,1)*60000); // minutes to millis
+                system_state = 14; // Return to System Settings
+            }break;
+
+        case 18: // Change Alarm Countdown
+            {
+                Serial.print("Previous alarm countdown was set to ");
+                Serial.print(countdown/1000);
+                Serial.println("s");
+                Serial.println("Input a new countdown in seconds:");
+                countdown = 1000*keypad.getNumber(1000,1); // seconds to millis
+                system_state = 14; // Return to System Settings
             }break;
 
         default:

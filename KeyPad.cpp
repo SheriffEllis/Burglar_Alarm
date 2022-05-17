@@ -24,6 +24,28 @@ void KeyPad::waitForInput(unsigned long timer_start, unsigned long timeout){
     }
 }
 
+int KeyPad::getNumber(int upper, int lower){
+    bool valid = false;
+    int number = 0;
+    while(!valid){
+        flushSerial();
+        Serial.print("\nPlease input a number from ");
+        Serial.print(lower);
+        Serial.print(" to ");
+        Serial.println(upper);
+        waitForInput();
+        number = Serial.parseInt();
+        if(number < lower or number > upper){
+            Serial.println("Error: Invalid number. Please input only digits and no letters or characters.");
+            Serial.println("Number must be within range specified");
+        }else{
+            valid = true;
+        }
+    }
+    flushSerial();
+    return number;
+}
+
 int KeyPad::getPin(){
     bool valid = false;
     int pin = 0;
@@ -32,7 +54,7 @@ int KeyPad::getPin(){
         Serial.println("\nPlease input a 4-digit pin:");
         waitForInput();
         pin = Serial.parseInt();
-        if(pin == 0 or pin > 9999){
+        if(pin <= 0 or pin > 9999){
             Serial.println("Error: Invalid pin. Please input only 4 digits and no letters or characters.");
             Serial.println("The pin 0000 will not be accepted.");
         }else{
@@ -56,7 +78,7 @@ int KeyPad::getPin(unsigned long timer_start, unsigned long timeout){
             return -1; // -1 represents failed pin entry
         }
         pin = Serial.parseInt();
-        if(pin == 0 or pin > 9999){
+        if(pin <= 0 or pin > 9999){
             Serial.println("Error: Invalid pin. Please input only 4 digits and no letters or characters.");
             Serial.println("The pin 0000 will not be accepted.");
         }else{

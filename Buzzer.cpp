@@ -8,10 +8,24 @@ Buzzer::Buzzer(int loud_pin, int quiet_pin){
     this->quiet_pin = quiet_pin;
     // Default parameters
     tone_freq = 400;
+    timeout = 1.2e+6;
 }
 
 void Buzzer::setTone(int tone_freq){
     this->tone_freq = tone_freq;
+}
+
+void Buzzer::setTimeout(unsigned long timeout){
+    if(timeout > 1.2e+6){
+        Serial.println("Max of 20 minutes exceeded, setting timeout to 20 minutes");
+        this->timeout = 1.2e+6;
+    }else{
+        this->timeout = timeout;
+    }
+}
+
+unsigned long Buzzer::getTimeout(){
+    return timeout;
 }
 
 void Buzzer::pulse(unsigned long duration, bool is_quiet){
@@ -26,7 +40,7 @@ void Buzzer::start(bool is_quiet){
     stop();
     int pin;
     if(is_quiet){pin = quiet_pin;}else{pin = io_pin;}
-    tone(pin, tone_freq, TIMEOUT); // Run buzzer until the absolute upper limit (20 minutes)
+    tone(pin, tone_freq, timeout); // Run buzzer until the absolute upper limit (20 minutes)
 }
 
 void Buzzer::stop(){

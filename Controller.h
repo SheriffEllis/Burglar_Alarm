@@ -15,9 +15,9 @@
 
 class Controller{
   private:
-    const static unsigned long COUNTDOWN = 20000; // Alarm countdown is 20s
     int system_state;
-    unsigned long timer_start;
+    unsigned long countdown; // system setting for how long to allow for pin entry before setting off alarm
+    unsigned long timer_start; // variable for use with non-delay timers
     KeyPad keypad;
     FacialRecognition facial_recognition;
     PinHandler pin_handler;

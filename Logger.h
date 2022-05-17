@@ -1,7 +1,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#define LOGGER_ARRAY_LEN 10 // TODO return to original size
+#define LOGGER_ARRAY_LEN 50
 
 #include "Arduino.h"
 

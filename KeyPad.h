@@ -9,6 +9,7 @@ class KeyPad{
         void waitForInput(unsigned long timer_start, unsigned long timeout);
     public:
         void flushSerial();
+        int getNumber(int upper, int lower);
         int getPin();
         int getPin(unsigned long timer_start, unsigned long timeout);
         int getChoice(int max_choice_num);
