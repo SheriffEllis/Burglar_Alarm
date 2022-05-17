@@ -30,8 +30,6 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
 // prepares system to be put into the armed state and starts a countdown for user to leave
 void Controller::armAlarm(){
     Serial.println("Arming alarm system...\nCountdown begun");
-    solenoid.open(); // Open door until end of countdown
-    logger.logEvent(Event::solenoidOpened);
     buzzer.setTone(400);
     for (int i = countdown/1000; i >= 0; i--)
     {
@@ -82,7 +80,7 @@ void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
     if(solenoid.getState()){logger.logEvent(Event::solenoidClosed);} // Only record closing if was open to begin with
-    solenoid.close();
+    solenoid.open();
     pin_handler.resetTries();
     buzzer.stop();
     logger.logEvent(Event::alarmReset);
@@ -135,6 +133,7 @@ some states were redundant in implementation, resulting in unused numbers
 4 - Arm Alarm
 6 - Armed state
 7 - countdown state: Sensors triggered OR Facial recognition success
+8 - Waiting for facial rec after alarm triggered
 11 - Waiting for PIN in triggered state
 12 - Check Log
 13 - Check Sensors
@@ -213,8 +212,8 @@ void Controller::processSysState(){
         case 7: // countdown state: Sensors triggered OR Facial recognition success
             {
                 if(pin_handler.getTries() > 3 or (millis() - timer_start) >= countdown){ // If tries or timer exceeded
-                    triggerAlarm(); 
-                    system_state = 11; // Waiting for PIN in alarm triggered state
+                    triggerAlarm();
+                    system_state = 8; // Waiting for facial rec after alarm triggered
                 }
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
                     while(pin_handler.getTries() <= 3 and (millis() - timer_start) < countdown){ // While tries haven't been exceeded, nor timer
@@ -231,6 +230,13 @@ void Controller::processSysState(){
                     }
                 }
             }break;
+
+        case 8: // Waiting for facial rec after alarm triggered
+            {
+                if(solenoid.getState()){
+                    system_state = 11; // Waiting for PIN in alarm triggered state
+                }
+            };
 
         case 11: // Waiting for PIN in alarm triggered state
             {
