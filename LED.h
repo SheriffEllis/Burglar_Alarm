@@ -1,6 +1,6 @@
 /*
- * LED Peripheral class allows LED to be turned on and off and keep track of its state
- */
+The LED Peripheral class allows LED to be turned on and off and keep track of its state
+*/
 
 #ifndef LED_H
 #define LED_H

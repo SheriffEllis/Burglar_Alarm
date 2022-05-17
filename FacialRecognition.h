@@ -1,10 +1,10 @@
 /*
- * This facial recognition class has not been fully implemented due to time constraints.
- * Normally this would listen for input from MATLAB on the results of facial recognition
- * as well as send prompts for actions to the MATLAB script. However in this program it
- * simply returns fake positives for setting up faces and listens in the serial monitor for
- * the phrase "-f" to indicate a successful facial recognition.
- */
+This facial recognition class has not been fully implemented due to time constraints.
+Normally this would listen for input from MATLAB on the results of facial recognition
+as well as send prompts for actions to the MATLAB script. However in this program it
+simply returns fake positives for setting up faces and listens in the serial monitor for
+the phrase "-f" to indicate a successful facial recognition.
+*/
 
 #ifndef FACIALRECOGNITION_H
 #define FACIALRECOGNITION_H

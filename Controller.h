@@ -1,9 +1,9 @@
 /*
- * The Controller class is in charge of managing all of the other sensor and actuator classes
- * as well as using the keypad to provide the user interface. Its two public functions,
- * processSysState() and updateSensors() are intended to be run in the main loop and handle
- * the system's logic internally.
- */
+The Controller class is in charge of managing all of the other sensor and actuator classes
+as well as using the keypad to provide the user interface. Its two public functions,
+processSysState() and updateSensors() are intended to be run in the main loop and handle
+the system's logic internally.
+*/
 
 #ifndef CONTROLLER_H
 #define CONTROLLER_H

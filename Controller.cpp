@@ -127,23 +127,23 @@ void Controller::displaySensors(){
 }
 
 /*
- *  state values decided on from UML state diagram
- *  some states were redundant in implementation, resulting in unused numbers
- *  0 - Initial state
- *  1 - Alarm disabled, waiting on user to log in
- *  3 - Main menu
- *  4 - Arm Alarm
- *  6 - Armed state
- *  7 - countdown state: Sensors triggered OR Facial recognition success
- *  11 - Waiting for PIN in triggered state
- *  12 - Check Log
- *  13 - Check Sensors
- *  14 - System Settings
- *  15 - Setting new pin
- *  16 - Setting facial recognition
- *  17 - Change Buzzer Timeout
- *  18 - Change Alarm Countdown
- */
+state values decided on from UML state diagram
+some states were redundant in implementation, resulting in unused numbers
+0 - Initial state
+1 - Alarm disabled, waiting on user to log in
+3 - Main menu
+4 - Arm Alarm
+6 - Armed state
+7 - countdown state: Sensors triggered OR Facial recognition success
+11 - Waiting for PIN in triggered state
+12 - Check Log
+13 - Check Sensors
+14 - System Settings
+15 - Setting new pin
+16 - Setting facial recognition
+17 - Change Buzzer Timeout
+18 - Change Alarm Countdown
+*/
 void Controller::processSysState(){
     switch(system_state){
         case 0: // Initial state
@@ -213,7 +213,7 @@ void Controller::processSysState(){
         case 7: // countdown state: Sensors triggered OR Facial recognition success
             {
                 if(pin_handler.getTries() > 3 or (millis() - timer_start) >= countdown){ // If tries or timer exceeded
-                    triggerAlarm();
+                    triggerAlarm(); 
                     system_state = 11; // Waiting for PIN in alarm triggered state
                 }
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN

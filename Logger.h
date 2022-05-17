@@ -1,8 +1,8 @@
 /*
- * The Logger class is in charge of storing events and the time they occured at.
- * This can be used by the user or maintenence to troubleshoot issues or to find out
- * if there have been failed attempts to access the system in their absence.
- */
+The Logger class is in charge of storing events and the time they occured at.
+This can be used by the user or maintenence to troubleshoot issues or to find out
+if there have been failed attempts to access the system in their absence.
+*/
 
 #ifndef LOGGER_H
 #define LOGGER_H

@@ -1,12 +1,11 @@
 /*
- * The Buzzer Peripheral class stores the tone and timeout of the buzzer.
- * This class makes primary use of the tone function with some
- * additional internal logic. The buzzer tone should never exceed the 
- * max timeout of 20 minutes. The buzzer class also allows for the use
- * of a quiet pin which runs the tone signal through a resistor before
- * reaching the buzzer.
- */
-
+The Buzzer Peripheral class stores the tone and timeout of the buzzer.
+This class makes primary use of the tone function with some
+additional internal logic. The buzzer tone should never exceed the 
+max timeout of 20 minutes. The buzzer class also allows for the use
+of a quiet pin which runs the tone signal through a resistor before
+reaching the buzzer.
+*/
 
 #ifndef BUZZER_H
 #define BUZZER_H

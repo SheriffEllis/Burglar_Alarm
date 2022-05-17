@@ -1,7 +1,7 @@
 /*
- * Provides a means of acquiring input in the form of pins, numbers, and choices
- * from the user's keypad/serial input
- */
+Provides a means of acquiring input in the form of pins, numbers, and choices
+from the user's keypad/serial input
+*/
 
 #ifndef KEYPAD_H
 #define KEYPAD_H
