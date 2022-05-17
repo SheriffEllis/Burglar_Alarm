@@ -213,7 +213,12 @@ void Controller::processSysState(){
             {
                 if(pin_handler.getTries() > 3 or (millis() - timer_start) >= countdown){ // If tries or timer exceeded
                     triggerAlarm();
-                    system_state = 8; // Waiting for facial rec after alarm triggered
+                    if(!solenoid.getState()){
+                        Serial.println("Still awaiting facial recognition to open door.");
+                        system_state = 8; // Waiting for facial rec after alarm triggered
+                    }else{
+                        system_state = 11; // Waiting for PIN in alarm triggered state
+                    }
                 }
                 if(solenoid.getState()){ // If facial rec succeeded, await PIN
                     while(pin_handler.getTries() <= 3 and (millis() - timer_start) < countdown){ // While tries haven't been exceeded, nor timer
