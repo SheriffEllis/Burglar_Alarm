@@ -29,6 +29,7 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
 void Controller::armAlarm(){
     Serial.println("Arming alarm system...\n20 second countdown begun");
     solenoid.open(); // Open door until end of countdown
+    logger.logEvent(Event::solenoidOpened);
     buzzer.setTone(400);
     for (int i = 20; i >= 0; i--) // TODO: update timer for demo
     {
@@ -41,6 +42,7 @@ void Controller::armAlarm(){
     Serial.println("(Type \"-f\" to simulate matlab input of recognised face)");
     armed_LED.setState(true);
     solenoid.close();
+    logger.logEvent(Event::solenoidClosed);
     buzzer.setTone(1000);
     buzzer.pulse(1000); // longer loud pulse
 }
@@ -54,6 +56,7 @@ bool Controller::armedCheck(){
             Serial.println("can be entered to stop the countdown.");
         }
         timer_start = millis(); // Start timer
+        buzzer.setTone(400);
         buzzer.pulse(COUNTDOWN, true);
         pin_handler.resetTries();
         return true;
@@ -75,6 +78,7 @@ void Controller::resetAlarm(){
     armed_LED.setState(false);
     triggered_LED.setState(false);
     solenoid.close();
+    logger.logEvent(Event::solenoidClosed);
     pin_handler.resetTries();
     buzzer.stop();
     logger.logEvent(Event::alarmReset);
@@ -83,6 +87,40 @@ void Controller::resetAlarm(){
 // largely placeholder function for outputting to monitoring station hardware
 void Controller::sendAlert(){
     Serial.println("Monitoring Station Alerted.");
+}
+
+//FIXME
+// Displays status of sensors to serial monitor (for menu option)
+void Controller::displaySensors(){
+    Serial.println("\n--------------------------------");
+    Serial.println("PIR:");
+    Serial.print("Mode: ");
+    if(pir.getEnabled()){
+        Serial.print("Enabled");
+    }else{
+        Serial.print("Disabled");
+    }
+    Serial.print("\tMeasuring: ");
+    if(pir.measure()){
+        Serial.println("HIGH");
+    }else{
+        Serial.println("LOW");
+    }
+
+    Serial.println("\nMagnetic Switch:");
+    Serial.print("Mode: ");
+    if(magnetic_switch.getEnabled()){
+        Serial.print("Enabled");
+    }else{
+        Serial.print("Disabled");
+    }
+    Serial.print("\tMeasuring: ");
+    if(magnetic_switch.measure()){
+        Serial.println("HIGH");
+    }else{
+        Serial.println("LOW");
+    }
+    Serial.println("--------------------------------");
 }
 
 /*
@@ -96,11 +134,11 @@ void Controller::sendAlert(){
  *  6 - Armed state
  *  7 - COUNTDOWN state: Sensors triggered OR Facial recognition success
  *  11 - Waiting for PIN in triggered state
- *  12 - Check Log TODO
- *  13 - Check Sensors TODO
+ *  12 - Check Log
+ *  13 - Check Sensors FIXME
  *  14 - System Settings TODO
  *  15 - Setting new pin TODO
- *  16 - Setting facial recognition TODO
+ *  16 - Setting facial recognition
  */
 void Controller::processSysState(){
     switch(system_state){
@@ -204,9 +242,10 @@ void Controller::processSysState(){
                 system_state = 3; // Return to main menu
             }break;
 
-        case 13: // Check Sensors TODO
+        case 13: // Check Sensors FIXME
             {
-
+                displaySensors();
+                system_state = 3; // Return to Main Menu
             }break;
 
         case 16: // Setting up facial recognition

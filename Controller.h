@@ -33,6 +33,7 @@ class Controller{
     void triggerAlarm();
     void resetAlarm();
     void sendAlert();
+    void displaySensors();
   public:
     Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_pin, int quiet_buzz_pin, int solenoid_pin, int magswitch_pin, int PIR_pin);
     void processSysState();

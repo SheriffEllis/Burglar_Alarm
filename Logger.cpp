@@ -76,5 +76,4 @@ void Logger::printLog(){
         }
     }
     Serial.println();
-    
 }
