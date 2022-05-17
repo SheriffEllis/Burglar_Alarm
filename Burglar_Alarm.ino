@@ -1,13 +1,13 @@
 #include "Arduino.h"
 #include "Controller.h"
 
-#define ARMED_LED_PIN 10
-#define TRIGGERED_LED_PIN 10
-#define LOUD_BUZZ_PIN 9
-#define QUIET_BUZZ_PIN 9
-#define SOLENOID_PIN 8
-#define MAGSWITCH_PIN 12
-#define PIR_PIN 11
+#define ARMED_LED_PIN 41
+#define TRIGGERED_LED_PIN 45
+#define LOUD_BUZZ_PIN 31
+#define QUIET_BUZZ_PIN 52
+#define SOLENOID_PIN 27
+#define MAGSWITCH_PIN 35
+#define PIR_PIN 25
 
 // The controller class managed all sensors and actuators internally within the main loop
 Controller controller(ARMED_LED_PIN, TRIGGERED_LED_PIN, LOUD_BUZZ_PIN, QUIET_BUZZ_PIN, SOLENOID_PIN, MAGSWITCH_PIN, PIR_PIN);
