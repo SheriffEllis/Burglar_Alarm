@@ -22,7 +22,13 @@ void PIR::calibrate(int seconds){
 // outputs value of digital read at pin and stores in state variable
 bool PIR::measure(){
     if(enabled){ // Only take a measurement if the sensor is enabled
-        state = digitalRead(io_pin);
+        state = true;
+        for (int i = 0; i < 5; i++)
+        {
+            if(!digitalRead(io_pin)){
+                state = false;
+            }
+        }
     }else{
         state = false;
     }
