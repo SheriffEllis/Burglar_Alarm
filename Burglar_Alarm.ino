@@ -1,6 +1,3 @@
-// TODO: add header comments to all class headers
-// TODO: add function descriptions to all functions
-
 #include "Arduino.h"
 #include "Controller.h"
 
@@ -17,13 +14,8 @@ Controller controller(ARMED_LED_PIN, TRIGGERED_LED_PIN, LOUD_BUZZ_PIN, QUIET_BUZ
 void setup(){
   Serial.begin(9600);
   Serial.println("Initialised");
-  Serial.println("Please wait while PIR sensor calibrates...");
-  // TODO: update timer
-  for (int i = 2; i > 0; i--) // wait 20 seconds
-  {
-    Serial.println(i);
-    delay(1000);
-  }
+  controller.calibrate(30);
+  Serial.println("The default PIN is 1234");
 }
 
 void loop(){

@@ -11,10 +11,11 @@
 #include "MagneticSwitch.h"
 #include "PIR.h"
 
-
+// Constructor runs all subclass constructors to set pins then sets the main
+// system variables to their default values
 Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_pin,
     int quiet_buzz_pin, int solenoid_pin, int magswitch_pin, int PIR_pin):
-        armed_LED(armed_LED_pin),
+        armed_LED(armed_LED_pin), // Subclass initialisation
         triggered_LED(triggered_LED_pin),
         buzzer(loud_buzz_pin, quiet_buzz_pin),
         solenoid(solenoid_pin),
@@ -28,11 +29,11 @@ Controller::Controller(int armed_LED_pin, int triggered_LED_pin, int loud_buzz_p
 
 // prepares system to be put into the armed state and starts a countdown for user to leave
 void Controller::armAlarm(){
-    Serial.println("Arming alarm system...\n20 second countdown begun");
+    Serial.println("Arming alarm system...\nCountdown begun");
     solenoid.open(); // Open door until end of countdown
     logger.logEvent(Event::solenoidOpened);
     buzzer.setTone(400);
-    for (int i = 20; i >= 0; i--) // TODO: update timer for demo
+    for (int i = countdown/1000; i >= 0; i--)
     {
         Serial.print(i);
         Serial.println("s");
@@ -92,7 +93,7 @@ void Controller::sendAlert(){
     Serial.println("Monitoring Station Alerted.");
 }
 
-// Displays status of sensors to serial monitor (for menu option)
+// displays status of sensors to serial monitor (for menu option)
 void Controller::displaySensors(){
     Serial.println("\n--------------------------------");
     Serial.println("PIR:");
@@ -157,6 +158,7 @@ void Controller::processSysState(){
                 Serial.println("your PIN must be re-entered to continue");
                 Serial.println("There is no limit to the number of attempts.");
                 if(pin_handler.verifyPin(keypad.getPin())){
+                    logger.logEvent(Event::successfulLogin);
                     system_state = 3; // Main menu
                 }else{
                     logger.logEvent(Event::failedLogin);
@@ -166,7 +168,7 @@ void Controller::processSysState(){
 
         case 3: // Main menu
             {
-                Serial.println("0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Check Log\n4 - Arm Alarm");
+                Serial.println("\n0 - Back\n1 - System Settings\n2 - Check Sensors\n3 - Check Log\n4 - Arm Alarm");
                 int choice = keypad.getChoice(4);
                 switch(choice){
                     case 0:
@@ -253,8 +255,20 @@ void Controller::processSysState(){
 
         case 14: // System Settings
             {
-                Serial.println("0 - Back\n1 - Change PIN\n2 - Setup Facial Recognition\n3 - Change Buzzer Timeout\n4 - Change Alarm Countdown");
-                int choice = keypad.getChoice(4);
+                Serial.println("\n0 - Back\n1 - Change PIN\n2 - Setup Facial Recognition\n3 - Change Buzzer Timeout\n4 - Change Alarm Countdown");
+                Serial.print("5 - Toggle PIR ");
+                if(pir.getEnabled()){
+                    Serial.println("(ENABLED)");
+                }else{
+                    Serial.println("(DISABLED)");
+                }
+                Serial.print("6 - Toggle Magnetic Switch ");
+                    if(magnetic_switch.getEnabled()){
+                        Serial.println("(ENABLED)");
+                    }else{
+                        Serial.println("(DISABLED)");
+                    }
+                int choice = keypad.getChoice(6);
                 switch(choice){
                     case 0:
                         system_state = 3; // Return to Main Menu
@@ -271,6 +285,20 @@ void Controller::processSysState(){
                     case 4:
                         system_state = 18; // Change Alarm Countdown
                         break;
+                    case 5: // Toggle PIR
+                        if(pir.getEnabled()){
+                            pir.disable();
+                        }else{
+                            pir.enable();
+                        }
+                        break;
+                    case 6: // Toggle Magnetic Switch
+                        if(magnetic_switch.getEnabled()){
+                            magnetic_switch.disable();
+                        }else{
+                            magnetic_switch.enable();
+                        }
+                        break;
                     default:
                         system_state = 0;
                         break;
@@ -283,8 +311,10 @@ void Controller::processSysState(){
                 if(pin_handler.verifyPin(keypad.getPin())){
                     Serial.println("Input the NEW pin:");
                     pin_handler.setPin(keypad.getPin());
+                    logger.logEvent(Event::pinChanged);
                     system_state = 14;
                 }else{
+                    logger.logEvent(Event::failedLogin);
                     Serial.println("0 - Try again\n1 - Go back");
                     if(keypad.getChoice(1)){ // If 1 is choosen this is equivalent to boolean true
                         system_state = 14; // System Settings
@@ -315,6 +345,9 @@ void Controller::processSysState(){
                 Serial.println("m");
                 Serial.println("Input a new timeout in minutes:");
                 buzzer.setTimeout((unsigned long)keypad.getNumber(20,1)*60000); // minutes to millis
+                Serial.print("New buzzer timeout set to ");
+                Serial.print((buzzer.getTimeout()/1000)/60);
+                Serial.println("m");
                 system_state = 14; // Return to System Settings
             }break;
 
@@ -325,6 +358,9 @@ void Controller::processSysState(){
                 Serial.println("s");
                 Serial.println("Input a new countdown in seconds:");
                 countdown = 1000*keypad.getNumber(1000,1); // seconds to millis
+                Serial.print("New alarm countdown set to ");
+                Serial.print(countdown/1000);
+                Serial.println("s");
                 system_state = 14; // Return to System Settings
             }break;
 
@@ -336,6 +372,7 @@ void Controller::processSysState(){
     }
 }
 
+// as in the name, updates the state of the PIR, Magswitch, and listens for facial recognition
 void Controller::updateSensors(){
     if(magnetic_switch.getEnabled()){ // Only take a measurement if the sensor is enabled
         if(magnetic_switch.measure()){ // Log if sensor gets a positive reading
@@ -353,4 +390,9 @@ void Controller::updateSensors(){
         logger.logEvent(Event::solenoidOpened);
     }
     keypad.flushSerial();
+}
+
+// Allows the PIR sensor to calibrate at the beginning of the program
+void Controller::calibrate(int seconds){
+    pir.calibrate(seconds);
 }

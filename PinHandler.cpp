@@ -2,14 +2,13 @@
 
 #include "Arduino.h"
 
+// Constructor sets default pin value and failed attempts to 0
 PinHandler::PinHandler(){
     stored_pin = 1234; // Default pin
+    tries = 0;
 }
 
-PinHandler::PinHandler(int pin){
-    stored_pin = pin;
-}
-
+// Takes a pin and compares it against the stored pin, incrementing tries if incorrect
 bool PinHandler::verifyPin(int pin){
     if(stored_pin==pin){
         Serial.println("CORRECT PIN");
@@ -23,14 +22,17 @@ bool PinHandler::verifyPin(int pin){
     }
 }
 
+// Setter method for pin
 void PinHandler::setPin(int pin){
     stored_pin = pin;
 }
 
+// Getter method for tries
 int PinHandler::getTries(){
     return tries;
 }
 
+// Sets tries to 0
 void PinHandler::resetTries(){
     tries = 0;
 }

@@ -1,3 +1,9 @@
+/*
+ * The Solenoid Peripheral class is a simple actuator class that
+ * opens and closes the solenoid and keeps track of its current state
+ * open: state = true, closed: state = false
+ */
+
 #ifndef SOLENOID_H
 #define SOLENOID_H
 
@@ -9,7 +15,6 @@ class Solenoid : public Peripheral{
     Solenoid(int output_pin);
     void open();
     void close();
-    void disable();
 };
 
 #endif // SOLENOID_H

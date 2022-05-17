@@ -1,3 +1,11 @@
+/*
+ * The PIR Peripheral class is a sensor that reads the digital input
+ * of a pin unless it has been disabled.
+ * 
+ * It also possess a calibrate() process that allows the physical component
+ * time to calibrate at the start of the program.
+ */
+
 #ifndef PIR_H
 #define PIR_H
 
@@ -7,8 +15,8 @@
 
 class PIR : public Peripheral{
   public:
-    long time_of_last_measure;
     PIR(int input_pin);
+    void calibrate(int seconds);
     bool measure();
 };
 

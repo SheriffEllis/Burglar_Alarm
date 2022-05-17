@@ -10,20 +10,21 @@ void KeyPad::flushSerial(){
     }
 }
 
-// wait for input without a timeout
+// wait for input from user without a timeout
 void KeyPad::waitForInput(){
     while(!Serial.available()){
         // Do nothing
     }
 }
 
-// wait for input with a timeout
+// wait for input from user with a timeout
 void KeyPad::waitForInput(unsigned long timer_start, unsigned long timeout){
     while(!Serial.available() and (millis() - timer_start) < timeout){
         // Do nothing
     }
 }
 
+// gets a number within the range specified from user input
 int KeyPad::getNumber(int upper, int lower){
     bool valid = false;
     int number = 0;
@@ -46,6 +47,7 @@ int KeyPad::getNumber(int upper, int lower){
     return number;
 }
 
+// gets a valid pin (value from 0001 to 9999) without a timer
 int KeyPad::getPin(){
     bool valid = false;
     int pin = 0;
@@ -65,6 +67,7 @@ int KeyPad::getPin(){
     return pin;
 }
 
+// gets a valid pin (value from 0001 to 9999) with a timer
 int KeyPad::getPin(unsigned long timer_start, unsigned long timeout){
     bool valid = false;
     int pin = 0;
@@ -89,6 +92,8 @@ int KeyPad::getPin(unsigned long timer_start, unsigned long timeout){
     return pin;
 }
 
+// gets a choice (a number from 0 to 9) from the user
+// the largest number that can be chosen is max_choice_num
 int KeyPad::getChoice(int max_choice_num){
     bool valid = false;
     char choice;
