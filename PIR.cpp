@@ -23,9 +23,11 @@ void PIR::calibrate(int seconds){
 bool PIR::measure(){
     if(enabled){ // Only take a measurement if the sensor is enabled
         state = true;
+        // Address instability of PIR sensor
         for (int i = 0; i < 5; i++)
         {
             if(!digitalRead(io_pin)){
+                // Output false if measurement was a blip
                 state = false;
             }
         }
